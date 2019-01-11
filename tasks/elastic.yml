@@ -1,0 +1,41 @@
+---
+- hosts: elastic
+  sudo: yes
+# tasks file for elk
+  tasks:
+    - name: Add repo
+      apt_repository:
+        repo: 'ppa:webupd8team/java'
+        state: present
+
+    - name: Update cache
+      apt:
+          update_cache: yes
+
+    - name: Accept Java8 license
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections 
+
+    - name: Setup Java8
+      apt:
+        name: oracle-java8-installer
+        state: present
+        update_cache: yes
+        force: yes
+
+    - name: Elasticsearch Setup
+      apt:
+        deb: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
+
+    - name: Configure ElasticSearch
+      template:
+        src: /home/roshan/Devops/elk/templates/elasticsearch.yml.j2
+        dest: /etc/elasticsearch/elasticsearch.yml
+
+    - name: Start Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted
+        enabled: true
+
+
+

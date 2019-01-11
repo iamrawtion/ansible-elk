@@ -1,0 +1,79 @@
+---
+- hosts: logstash
+  sudo: yes
+# tasks file for elk
+  tasks:
+    - name: Add repo
+      apt_repository:
+        repo: 'ppa:webupd8team/java'
+        state: present
+
+    - name: Update cache
+      apt:
+          update_cache: yes
+
+    - name: Accept Java8 license
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections 
+
+    - name: Setup Java8
+      apt:
+        name: oracle-java8-installer
+        state: present
+        update_cache: yes
+        force: yes
+
+    - name: Logstash Setup
+      apt:
+        deb: http://artifacts.elastic.co/downloads/logstash/logstash-6.5.4.deb
+
+    - name: Install Python dependencies
+      apt: 
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python
+        - python-pip
+
+    - name: Get input file
+      copy:
+        src: ../files/02-beats-input.conf
+        dest: /etc/logstash/conf.d/02-beats-input.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Syslog filter file
+      copy:
+        src: ../files/10-syslog-filter.conf
+        dest: /etc/logstash/conf.d/10-syslog-filter.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: ES output file
+      copy:
+        src: ../files/30-elasticsearch-output.conf
+        dest: /etc/logstash/conf.d/30-elasticsearch-output.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Start Logstash
+      service:
+        name: logstash
+        state: started
+
+      
+        #    - name: Configure Logstash
+        #template:
+          #src: ../templates/logstash.yml.j2
+          #dest: /etc/logstash/logstash.yml
+
+          #- name: Start Logstash
+          #service:
+            #name: logstash
+            #state: restarted
+            #enabled: true
+
+
+

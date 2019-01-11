@@ -1,0 +1,45 @@
+---
+- hosts: k
+  sudo: yes
+# tasks file for elk
+  tasks:
+    - name: Add repo
+      apt_repository:
+        repo: 'ppa:webupd8team/java'
+        state: present
+
+    - name: Update cache
+      apt:
+          update_cache: yes
+
+    - name: Accept Java8 license
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections 
+
+    - name: Setup Java8
+      apt:
+        name: oracle-java8-installer
+        state: present
+        update_cache: yes
+        force: yes
+
+    - name: Kibana Setup
+      apt:
+        deb: http://artifacts.elastic.co/downloads/kibana/kibana-6.5.4-amd64.deb 
+
+    - name: Configure Kibana
+      copy:
+        src: ../files/kibana.yml
+        dest: /etc/kibana/
+        owner: root
+        group: root
+        mode: 0644
+
+
+    - name: Start Kibana
+      service:
+        name: kibana
+        state: started
+        enabled: true
+
+
+

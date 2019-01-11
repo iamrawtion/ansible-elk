@@ -1,0 +1,92 @@
+---
+- hosts: filebeat
+  sudo: yes
+# tasks file for elk
+  tasks:
+    - name: Add Kafka user
+      user:
+        name: kafka
+        group: sudo
+        password: $6$kafkapass$wKf0u0RrBUDpAL1g/Tlp8HVbrA7OMwSW8uPdiqv9Hvz5kIqJo7XBKsChKYxvSiB2Go/IRanBx2nAxv8bi4OvU.
+
+    - name: Add repo
+      apt_repository:
+        repo: 'ppa:webupd8team/java'
+        state: present
+
+    - name: Accept Java8 license
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections 
+
+    - name: Setup Java8
+      apt:
+        name: oracle-java8-installer
+        state: present
+        update_cache: yes
+        force: yes
+
+    - name: Download Kafka tar
+      get_url:
+        url: http://mirrors.estointernet.in/apache/kafka/2.1.0/kafka_2.12-2.1.0.tgz
+        dest: /home/kafka/kafka.tgz
+
+    - name: Extract tar
+      unarchive:
+        src: /home/kafka/kafka.tgz
+        dest: /home/kafka/
+        remote_src: yes
+      
+    - name: Update cache
+      apt:
+        update_cache: yes
+
+    - name: Rename kafka directory
+      command: mv /home/kafka/kafka_2.12-2.1.0 /home/kafka/kafka
+
+    - name: Configure Kafka
+      copy:
+        src: "{{ item.files }}"
+        dest: "{{ item.dests }}"
+      with_items:
+        - { files: '../files/server.properties', dests: '/home/kafka/kafka/config/server.properties'  }
+        - { files: '../files/zookeeper.service', dests: '/etc/systemd/system/zookeeper.service' }
+        - { files: '../files/kafka.service', dests: '/etc/systemd/system/kafka.service' }
+
+    - name: Install systemd
+      apt:
+        name: systemd
+        state: present
+
+    - name: Start Kafka
+      service:
+        name: kafka
+        state: started
+
+
+
+          #    - name: Accept Java8 license
+          #shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections 
+
+          #- name: Setup Java8
+          #apt:
+            #name: oracle-java8-installer
+            #state: present
+            #update_cache: yes
+            #force: yes
+
+            #- name: Elasticsearch Setup
+            #apt:
+              #deb: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
+
+              #- name: Configure ElasticSearch
+              #template:
+                #src: /home/roshan/Devops/elk/templates/elasticsearch.yml.j2
+                #dest: /etc/elasticsearch/elasticsearch.yml
+
+                #- name: Start Elasticsearch
+                #service:
+                  #name: elasticsearch
+                  #state: restarted
+                  #enabled: true
+
+
+
