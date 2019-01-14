@@ -1,5 +1,10 @@
 ---
 
+- hosts: all
+  remote_user: "{{ ansible_system_user }}"
+  vars_files:
+    - vars/main.yml
+
 - include: common.yml
 - include: elastic.yml
 - include: logstash.yml

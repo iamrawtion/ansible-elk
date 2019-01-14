@@ -1,0 +1,21 @@
+galaxy_info:
+  author: 'Roshan Nagekar'
+  description: 'Role to setup ELK cluster'
+  company: 'Independednt Consultant'
+  issue_tracker_url: https://github.com/iamrawtion/ansible-elk/issues
+  license: MIT
+  min_ansible_version: 2.4
+  github_branch: expert
+  platforms:
+   - name: Ubuntu
+     versions:
+     - 16.04
+     - 18.04
+
+  galaxy_tags:
+    - elk
+    - elasticsearch
+    - logstash
+    - kibana
+
+dependencies: []

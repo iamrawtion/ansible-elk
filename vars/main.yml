@@ -1,0 +1,17 @@
+ansible_system_user: vagrant
+
+# Credentials
+kibana_user: kibana
+kibana_password: kibana
+
+# URLs
+elastic_download_url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
+logstash_download_url: http://artifacts.elastic.co/downloads/logstash/logstash-6.5.4.deb
+kibana_download_url: http://artifacts.elastic.co/downloads/kibana/kibana-6.5.4-amd64.deb
+
+
+# Ports config
+logstash_syslog_port: 5044
+logstash_localsyslog_port: 5000
+elasticsearch_port: 9200
+nginx_port: 80
